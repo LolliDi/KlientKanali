@@ -13,7 +13,10 @@ int main()
     DWORD actualwriten;
     DWORD dwMode = PIPE_READMODE_MESSAGE;
     BOOL isSuccess;
-    LPWSTR buffer;
+    BOOL otvet=FALSE;
+    LPWSTR buffer = (CHAR*)calloc(sizeBuffer, sizeof(CHAR));
+    BOOL SuccessRead;
+    char message[SIZE_BUFFER];
     while (TRUE)
     {
         hNamedPipe = CreateFile(lpszPipeName, GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
@@ -23,6 +26,8 @@ int main()
         {
             printf("\nСервер не отвечает!\n");
             Sleep(1000);
+            
+            Zap = TRUE;
         }
         else 
         {
@@ -30,13 +35,24 @@ int main()
             {
                 printf("\nСоединение установлено!\n");
                 Zap = FALSE;
+                otvet = TRUE;
             }
-           
-            char message[SIZE_BUFFER];
-            printf("Введите сообщение для сервера:\n");
-            gets(message);
-            LPWSTR buffer = &message;
-            WriteFile(hNamedPipe, buffer, sizeBuffer, &actualwriten, NULL);
+            if (otvet)
+            {
+                printf("Введите сообщение для сервера:\n");
+                gets(message);
+                buffer = &message;
+                WriteFile(hNamedPipe, buffer, sizeBuffer, &actualwriten, NULL);
+                otvet = FALSE;
+            }
+            SuccessRead = ReadFile(hNamedPipe, buffer, sizeBuffer, &actualwriten, NULL);
+            if (SuccessRead)
+            {
+                printf("Сервер пишет: ");
+                printf(buffer);
+                printf("\n");
+                otvet = TRUE;
+            }
 
         }
         Sleep(50);
