@@ -12,6 +12,7 @@ int main()
     DWORD sizeBuffer = SIZE_BUFFER;
     DWORD actualwriten;
     DWORD dwMode = PIPE_READMODE_MESSAGE;
+    DWORD actualreaden;
     BOOL isSuccess;
     BOOL otvet=FALSE;
     LPWSTR buffer = (CHAR*)calloc(sizeBuffer, sizeof(CHAR));
@@ -27,7 +28,7 @@ int main()
             printf("\nСервер не отвечает!\n");
             Sleep(1000);
             
-            Zap = TRUE;
+            //Zap = TRUE;
         }
         else 
         {
@@ -39,21 +40,32 @@ int main()
             }
             if (otvet)
             {
-                printf("Введите сообщение для сервера:\n");
+                printf("Введите цифру:\n");
                 gets(message);
-                buffer = &message;
-                WriteFile(hNamedPipe, buffer, sizeBuffer, &actualwriten, NULL);
+                WriteFile(hNamedPipe, &message, sizeBuffer, &actualwriten, NULL);
                 otvet = FALSE;
             }
-            SuccessRead = ReadFile(hNamedPipe, buffer, sizeBuffer, &actualwriten, NULL);
-            if (SuccessRead)
+            
+            SuccessRead = ReadFile(hNamedPipe, buffer, SIZE_BUFFER, &actualreaden, NULL);
+            while (!SuccessRead)
             {
-                printf("Сервер пишет: ");
-                printf(buffer);
-                printf("\n");
-                otvet = TRUE;
+                SuccessRead = ReadFile(hNamedPipe, buffer, SIZE_BUFFER, &actualreaden, NULL);
+                
             }
+            printf("Корень: ");
+            //buffer[actualwriten / 2] = '\0';
 
+            /*for (char* i = buffer; *i != ""; i++)
+            {
+                printf(*i);
+            }*/
+            LPWSTR cc = buffer;
+            char* c = buffer;
+            printf(cc);
+
+            printf("\n");
+            otvet = TRUE;
+            buffer = (CHAR*)calloc(sizeBuffer, sizeof(CHAR));
         }
         Sleep(50);
         CloseHandle(hNamedPipe);
