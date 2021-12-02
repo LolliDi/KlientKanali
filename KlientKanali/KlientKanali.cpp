@@ -3,6 +3,7 @@
 #define SIZE_BUFFER 140
 #define _CRT_SECURE_NO_WARNINGS
 
+
 int main()
 {
     system("chcp 1251>nul");
@@ -15,8 +16,10 @@ int main()
     DWORD actualreaden;
     BOOL isSuccess;
     BOOL otvet=FALSE;
-    LPWSTR buffer = (CHAR*)calloc(sizeBuffer, sizeof(CHAR));
+    LPWSTR buffer = calloc(sizeBuffer, sizeof(CHAR));
     BOOL SuccessRead;
+    LPWSTR cc = (CHAR*)calloc(500, sizeof(CHAR));
+    wchar_t mes = (CHAR*)calloc(500, sizeof(CHAR));
     char message[SIZE_BUFFER];
     while (TRUE)
     {
@@ -44,28 +47,20 @@ int main()
                 gets(message);
                 WriteFile(hNamedPipe, &message, sizeBuffer, &actualwriten, NULL);
                 otvet = FALSE;
+                message[actualwriten / 2] = '\0';
             }
-            
-            SuccessRead = ReadFile(hNamedPipe, buffer, SIZE_BUFFER, &actualreaden, NULL);
+
+            SuccessRead = ReadFile(hNamedPipe, buffer, sizeBuffer, &actualreaden, NULL);
             while (!SuccessRead)
             {
-                SuccessRead = ReadFile(hNamedPipe, buffer, SIZE_BUFFER, &actualreaden, NULL);
+                SuccessRead = ReadFile(hNamedPipe, buffer, sizeBuffer, &actualreaden, NULL);
                 
             }
-            printf("Корень: ");
-            //buffer[actualwriten / 2] = '\0';
-
-            /*for (char* i = buffer; *i != ""; i++)
-            {
-                printf(*i);
-            }*/
-            LPWSTR cc = buffer;
-            char* c = buffer;
-            printf(cc);
-
-            printf("\n");
+            wsprintf(cc, L"Корень = %s\0", buffer);
+            MessageBox(NULL, cc, L"Ответ", NULL);
             otvet = TRUE;
             buffer = (CHAR*)calloc(sizeBuffer, sizeof(CHAR));
+            cc = (CHAR*)calloc(sizeBuffer, sizeof(CHAR));
         }
         Sleep(50);
         CloseHandle(hNamedPipe);
