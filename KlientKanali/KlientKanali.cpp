@@ -22,12 +22,13 @@ DWORD WINAPI Soedin(char* param[2])
 		isSuccess = SetNamedPipeHandleState(hNamedPipe, &dwMode, NULL, NULL);
 		if (hNamedPipe == INVALID_HANDLE_VALUE) //если сервер не отвечает
 		{
-			if (i > 5) //если не отвечает больше 5сек
+			if (i > 2) //если не отвечает больше 5сек
 			{
 				printf("\nСервер не отвечает!\n");
 
 				Zap = TRUE;
 				param[1] = "0"; //соединение на нуле
+				param[0] = "";
 			}
 			i++;
 			Sleep(1000); //ждемс
@@ -38,6 +39,7 @@ DWORD WINAPI Soedin(char* param[2])
 			if (Zap) //если до этого было отключение/это первое подключение
 			{
 				printf("\nСоединение установлено!\n");
+
 				Zap = FALSE;
 				param[1] = "1"; //нужно записать число
 			}
@@ -96,9 +98,12 @@ int main()
 	{
 		if (param[1] == "1" && param[0] == "") //если нужно записать число и число ещё не записано
 		{
+			Sleep(3000); //не знаю почему, но так при одновременном запуске сервера и клиента - не зависает после ввода
+						 //не спрашивайте как я до этого дошел...
 			printf("Введите цифру:\n"); //записываем
 			gets(message);
 			param[0] = message;
 		}
+		Sleep(50);
 	}
 }
